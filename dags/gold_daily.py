@@ -135,10 +135,10 @@ def _make_count_check(task_id: str, query_template: str,
 
 with DAG(
     dag_id="gold_daily",
-    description="Daily gold aggregates after market close (23:00 UTC)",
+    description="Daily gold aggregates after market close (17:00 UTC)",
     default_args=DEFAULT_ARGS,
     start_date=datetime(2024, 1, 15),
-    schedule_interval="0 23 * * 1-5",   # Mon-Fri at 23:00 UTC (after last trading_pipeline slot)
+    schedule_interval="0 17 * * 1-5",   # Mon-Fri at 17:00 UTC
     catchup=False,
     max_active_runs=1,
     tags=["trading", "gold"],

@@ -215,10 +215,10 @@ This is the intraday trading pipeline. It ingests trades and quotes every 15 min
 Schedule:
 
 ```text
-*/15 6-22 * * 1-5
+*/15 9-15 * * 1-5
 ```
 
-That means every 15 minutes, Monday through Friday, from 06:00 through 22:45 UTC cron slots. The code comments describe it as the trading session window. `catchup=False`, `max_active_runs=2`.
+That means every 15 minutes, Monday through Friday, from 09:00 through 15:45 UTC cron slots. This matches the synthetic trade and quote files generated under `hh=09` through `hh=15`. `catchup=False`, `max_active_runs=2`.
 
 Required Airflow variables:
 
@@ -281,10 +281,10 @@ This DAG computes end-of-day Gold aggregates after the intraday pipeline has com
 Schedule:
 
 ```text
-0 23 * * 1-5
+0 17 * * 1-5
 ```
 
-That means Monday through Friday at 23:00 UTC. `catchup=False`, `max_active_runs=1`.
+That means Monday through Friday at 17:00 UTC. It runs after the final intraday trading pipeline slot has time to complete. `catchup=False`, `max_active_runs=1`.
 
 Required Airflow variables:
 

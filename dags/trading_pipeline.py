@@ -136,11 +136,11 @@ def _athena_count_check(query: str, athena_output: str,
 def _events_calendar_logical_date(trading_pipeline_logical_date: datetime) -> datetime:
     """Map this DAG's logical date to the matching events DAG logical date."""
     if (trading_pipeline_logical_date.hour,
-        trading_pipeline_logical_date.minute) == (22, 45):
+        trading_pipeline_logical_date.minute) == (15, 45):
         fire_time = trading_pipeline_logical_date + timedelta(days=1)
         while fire_time.weekday() >= 5:
             fire_time += timedelta(days=1)
-        fire_time = fire_time.replace(hour=6, minute=0, second=0, microsecond=0)
+        fire_time = fire_time.replace(hour=9, minute=0, second=0, microsecond=0)
     else:
         fire_time = trading_pipeline_logical_date + timedelta(minutes=15)
 
@@ -169,7 +169,7 @@ with DAG(
     description="15-min ingest: raw → bronze → silver → gold (ohlcv)",
     default_args=DEFAULT_ARGS,
     start_date=datetime(2024, 1, 15),
-    schedule_interval="*/15 6-22 * * 1-5",   # Mon-Fri, 06:00-22:00 UTC
+    schedule_interval="*/15 9-15 * * 1-5",   # Mon-Fri, 09:00-15:45 UTC
     catchup=False,
     max_active_runs=2,
     tags=["trading", "bronze", "silver", "gold"],

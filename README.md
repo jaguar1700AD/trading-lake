@@ -83,8 +83,8 @@ All timestamps and Airflow schedules use UTC.
 | DAG | Schedule | Purpose |
 | --- | --- | --- |
 | `events_calendar_daily` | `30 5 * * 1-5` | Loads corporate events from raw CSV into Bronze and Silver |
-| `trading_pipeline` | `*/15 6-22 * * 1-5` | Ingests trades and quotes every 15 minutes and updates intraday Gold tables |
-| `gold_daily` | `0 23 * * 1-5` | Computes daily VWAP and event-windowed volume after market close |
+| `trading_pipeline` | `*/15 9-15 * * 1-5` | Ingests trades and quotes every 15 minutes and updates intraday Gold tables |
+| `gold_daily` | `0 17 * * 1-5` | Computes daily VWAP and event-windowed volume after market close |
 | `iceberg_maintenance` | `0 2 * * 0` | Runs weekly Iceberg compaction, manifest rewrite, snapshot expiry, and orphan cleanup |
 
 ## Prerequisites

@@ -163,11 +163,16 @@ def wap_commit(spark: SparkSession, df: DataFrame) -> None:
 
     df.createOrReplaceTempView("silver_trades_staged")
 
-    has_snapshot = (
-        spark.sql(f"SELECT COUNT(*) AS snapshot_count FROM {target}.snapshots")
-        .collect()[0]["snapshot_count"] > 0
+    main_has_snapshot = (
+        spark.sql(f"""
+            SELECT COUNT(*) AS ref_count
+            FROM {target}.refs
+            WHERE name = 'main'
+              AND snapshot_id IS NOT NULL
+        """)
+        .collect()[0]["ref_count"] > 0
     )
-    if not has_snapshot:
+    if not main_has_snapshot:
         if not run_deequ_checks(spark, df):
             raise RuntimeError(f"Deequ checks failed for {DATE} — not publishing to main.")
         spark.sql(f"""

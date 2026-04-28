@@ -41,8 +41,6 @@ ICEBERG_SPARK_CONF = {
     "spark.sql.adaptive.coalescePartitions.enabled":    "true",
     "spark.sql.adaptive.skewJoin.enabled":              "true",
     "spark.sql.session.timeZone":                       "UTC",
-    "spark.executor.memory": "8g",
-    "spark.executor.cores":  "4",
 }
 
 
@@ -85,16 +83,6 @@ with DAG(
                     "logUri": f"s3://{BUCKET}/logs/emr/iceberg_maintenance/"
                 }
             },
-            "applicationConfiguration": [
-                {
-                    "classification": "spark-defaults",
-                    "properties": {
-                        "spark.dynamicAllocation.enabled":    "true",
-                        "spark.dynamicAllocation.minExecutors": "2",
-                        "spark.dynamicAllocation.maxExecutors": "20",
-                    }
-                }
-            ],
         },
         deferrable=True,
         wait_for_completion=True,

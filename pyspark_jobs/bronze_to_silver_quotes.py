@@ -137,10 +137,31 @@ def wap_commit(spark: SparkSession, df: DataFrame) -> None:
     target = "glue_catalog.silver.quotes"
     branch = f"audit_{BRANCH_TS}"
 
+    df.createOrReplaceTempView("silver_quotes_staged")
+
+    has_snapshot = (
+        spark.sql(f"SELECT COUNT(*) AS snapshot_count FROM {target}.snapshots")
+        .collect()[0]["snapshot_count"] > 0
+    )
+    if not has_snapshot:
+        if not run_deequ_checks(spark, df):
+            raise RuntimeError(f"Deequ checks failed for {DATE} — not publishing to main.")
+        spark.sql(f"""
+            MERGE INTO {target} AS t
+            USING silver_quotes_staged AS s
+            ON  t.exchange     = s.exchange
+            AND t.symbol       = s.symbol
+            AND t.exchange_ts  = s.exchange_ts
+            AND t.sequence_num = s.sequence_num
+            WHEN MATCHED THEN UPDATE SET *
+            WHEN NOT MATCHED THEN INSERT *
+        """)
+        print("Initial publish complete - silver.quotes updated.")
+        return
+
     spark.sql(f"ALTER TABLE {target} CREATE OR REPLACE BRANCH {branch}")
     spark.conf.set("spark.wap.branch", branch)
 
-    df.createOrReplaceTempView("silver_quotes_staged")
     spark.sql(f"""
         MERGE INTO {target} AS t
         USING silver_quotes_staged AS s
@@ -148,8 +169,8 @@ def wap_commit(spark: SparkSession, df: DataFrame) -> None:
         AND t.symbol       = s.symbol
         AND t.exchange_ts  = s.exchange_ts
         AND t.sequence_num = s.sequence_num
-        WHEN NOT MATCHED THEN INSERT *
         WHEN MATCHED THEN UPDATE SET *
+        WHEN NOT MATCHED THEN INSERT *
     """)
 
     audit_df = spark.sql(f"""

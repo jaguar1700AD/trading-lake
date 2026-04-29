@@ -140,7 +140,7 @@ with DAG(
     start_date=datetime(2024, 1, 15),
     schedule_interval="0 17 * * 1-5",   # Mon-Fri at 17:00 UTC
     catchup=False,
-    max_active_runs=1,
+    max_active_runs=2,
     tags=["trading", "gold"],
 ) as dag:
 
